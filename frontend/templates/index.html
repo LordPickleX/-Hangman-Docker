@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pendu</title>
+    <script>
+        // Fonction pour deviner une lettre
+        async function devinerLettre(event) {
+            event.preventDefault(); // Empêche le rechargement de la page
+
+            const lettre = document.getElementById("lettre").value.trim();
+            if (lettre.length !== 1) {
+                alert("Veuillez entrer une seule lettre.");
+                return;
+            }
+
+            try {
+                // Envoie la lettre au serveur
+                const response = await fetch("/deviner", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ lettre }) // Lettre envoyée au serveur
+                });
+
+                if (!response.ok) { // Vérifie si la requête a échoué
+                    throw new Error(`Erreur du serveur : ${response.statusText}`);
+                }
+
+                const data = await response.json(); // Lit la réponse
+                console.log("Réponse du serveur :", data); // Debug
+
+                // Met à jour les éléments HTML
+                document.getElementById("mot").innerText = data.mot;
+                document.getElementById("health").innerText = data.health;
+
+                // Conditions de fin de jeu
+                if (data.mot_trouve) {
+                    alert("Félicitations ! Vous avez trouvé le mot !");
+                    // Réinitialise le jeu
+                    // await resetGame();
+                } else if (data.perdu) {
+                    alert(`Dommage ! Le mot était : ${data.mot_complet}`);
+                    await resetGame();
+                }
+
+                document.getElementById("lettre").value = "";
+            } catch (error) {
+                console.error("Erreur :", error);
+                alert("Une erreur est survenue. Veuillez réessayer.");
+            }
+        }
+
+        // Fonction pour réinitialiser le jeu
+        async function resetGame() {
+            try {
+                // appelle la route de réinitialisation
+                const response = await fetch("/reset", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Erreur lors de la réinitialisation : ${response.statusText}`);
+                }
+
+                location.reload(); // Recharge la page après succès
+            } catch (error) {
+                console.error("Erreur lors de la réinitialisation :", error);
+                alert("Impossible de réinitialiser la session.");
+            }
+        }
+
+        // permet de rentrer les valeurs avec la touche entrée
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById("form-deviner").addEventListener("submit", devinerLettre);
+        });
+    </script>
+</head>
+<body>
+    <h1>Bienvenue au jeu du Pendu !</h1>
+    <!-- affiche les vies restantes -->
+    <p>Vies restantes : <span id="health">{{ health }}</span></p>
+    <!-- affiche le mot à deviner -->
+    <p>Mot à deviner : <span id="mot">{{ mot }}</span></p>
+
+    <!-- input pour entrer la lettre -->
+    <form id="form-deviner">
+        <label for="lettre">Entrez une lettre :</label>
+        <input type="text" id="lettre" name="lettre" maxlength="1" required>
+        <button type="submit">Deviner</button>
+    </form>
+
+    <!-- bouton pour réinitialiser le jeu et retourner au menu -->
+    <button onclick="resetGame()">Réinitialiser le jeu</button>
+    <button onclick="window.location.href='/menu'">Retour au menu</button>
+</body>
+</html>
