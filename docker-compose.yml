@@ -12,7 +12,7 @@ services:
     networks:
       mynetwork:
     ports:
-      - "3306:3306"
+      - "3306:3306" # enlever le numéro de port pour empêcher l'accès à la database ?
     volumes:
       - mysql-data:/var/lib/mysql
 
