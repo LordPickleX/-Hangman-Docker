@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pendu</title>
     <script>
+        // fonction pour mettre à jour l'image du pendu en fonction des vies restantes
+        function updatePenduImage(health) {
+            const penduImage = document.getElementById("pendu-image");
+            penduImage.src = `/static/images/pendu${8 - health}.png`;
+        }
+
         // Fonction pour deviner une lettre
         async function devinerLettre(event) {
             event.preventDefault(); // Empêche le rechargement de la page
@@ -16,34 +22,38 @@
             }
 
             try {
-                // Envoie la lettre au serveur
+                // envoie la lettre au serveur
                 const response = await fetch("/deviner", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ lettre }) // Lettre envoyée au serveur
                 });
 
-                if (!response.ok) { // Vérifie si la requête a échoué
+                if (!response.ok) { // vérifie si la requête a échoué
                     throw new Error(`Erreur du serveur : ${response.statusText}`);
                 }
 
-                const data = await response.json(); // Lit la réponse
-                console.log("Réponse du serveur :", data); // Debug
+                const data = await response.json();
+                console.log("Réponse du serveur :", data);
 
-                // Met à jour les éléments HTML
+                // met à jour les éléments HTML
                 document.getElementById("mot").innerText = data.mot;
                 document.getElementById("health").innerText = data.health;
 
-                // Conditions de fin de jeu
+                // appel de la fonction update de l'image
+                updatePenduImage(data.health);
+
+                // conditions de fin de jeu
                 if (data.mot_trouve) {
                     alert("Félicitations ! Vous avez trouvé le mot !");
                     // Réinitialise le jeu
                     // await resetGame();
                 } else if (data.perdu) {
                     alert(`Dommage ! Le mot était : ${data.mot_complet}`);
-                    await resetGame();
+                    // await resetGame();
                 }
 
+                // efface le champ de saisie
                 document.getElementById("lettre").value = "";
             } catch (error) {
                 console.error("Erreur :", error);
@@ -51,7 +61,7 @@
             }
         }
 
-        // Fonction pour réinitialiser le jeu
+        // fonction pour réinitialiser le jeu
         async function resetGame() {
             try {
                 // appelle la route de réinitialisation
@@ -64,7 +74,7 @@
                     throw new Error(`Erreur lors de la réinitialisation : ${response.statusText}`);
                 }
 
-                location.reload(); // Recharge la page après succès
+                location.reload(); // recharge la page après succès
             } catch (error) {
                 console.error("Erreur lors de la réinitialisation :", error);
                 alert("Impossible de réinitialiser la session.");
@@ -74,6 +84,12 @@
         // permet de rentrer les valeurs avec la touche entrée
         document.addEventListener("DOMContentLoaded", () => {
             document.getElementById("form-deviner").addEventListener("submit", devinerLettre);
+
+            // initialise l'image de départ
+            // recupere la valeur de health depuis le span
+            const initialHealth = parseInt(document.getElementById("health").innerText);
+            // met à jour de l'image dès le début
+            updatePenduImage(initialHealth);
         });
     </script>
 </head>
@@ -81,6 +97,9 @@
     <h1>Bienvenue au jeu du Pendu !</h1>
     <!-- affiche les vies restantes -->
     <p>Vies restantes : <span id="health">{{ health }}</span></p>
+    <!-- Affiche l'image du pendu -->
+    <p>Image du Pendu :</p>
+    <img id="pendu-image" src="{{ url_for('static', filename='images/pendu1.png') }}" alt="Pendu" width="200">
     <!-- affiche le mot à deviner -->
     <p>Mot à deviner : <span id="mot">{{ mot }}</span></p>
 

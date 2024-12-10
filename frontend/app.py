@@ -30,7 +30,7 @@ def home():
     if "mot" not in session:
         session["mot"] = "chocolat"
         session["guessed_letters"] = ["_" for _ in session["mot"]]
-        session["health"] = 8
+        session["health"] = 7
 
     # on passe les données nécessaires mot et santé
     # ce sont les variables qui seront dans le fichier html
