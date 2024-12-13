@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <title>Pendu</title>
     <script>
         // fonction pour mettre à jour l'image du pendu en fonction des vies restantes
@@ -98,25 +99,24 @@
     </script>
 </head>
 <body>
-    <h1>Bienvenue au jeu du Pendu !</h1>
-    <!-- affiche les vies restantes -->
-    <p>Vies restantes : <span id="health">{{ health }}</span></p>
-    <!-- Affiche l'image du pendu -->
-    <p>Image du Pendu :</p>
-    <img id="pendu-image" src="{{ url_for('static', filename='images/pendu1.png') }}" alt="Pendu" width="200">
-    <!-- affiche le mot à deviner -->
-    <p>Mot à deviner : <span id="mot">{{ mot }}</span></p>
-
-    <!-- input pour entrer la lettre -->
-    <form id="form-deviner">
-        <label for="lettre">Entrez une lettre :</label>
-        <input type="text" id="lettre" name="lettre" maxlength="1" required>
-        <button type="submit">Deviner</button>
-    </form>
-
-     <p>Lettres testées et perdues : <span id="lettre-perdue"></span></p>
-    <!-- bouton pour réinitialiser le jeu et retourner au menu -->
-    <button onclick="resetGame()">Réinitialiser le jeu</button>
-    <button onclick="window.location.href='/menu'">Retour au menu</button>
+    <div class="container">
+        <h1>Bienvenue au jeu du Pendu !</h1>
+        <div class="game-info">
+            <p>Vies restantes : <span id="health">{{ health }}</span></p>
+            <div class="pendu-container">
+                <img id="pendu-image" src="{{ url_for('static', filename='images/pendu1.png') }}" alt="Pendu" />
+            </div>
+            <p>Mot à deviner : <span id="mot">{{ mot }}</span></p>
+            <form id="form-deviner">
+                <input type="text" id="lettre" name="lettre" maxlength="1" required placeholder="Entrez une lettre">
+                <button type="submit">Deviner</button>
+            </form>
+            <p>Lettres testées et perdues : <span id="lettre-perdue"></span></p>
+        </div>
+        <div class="controls">
+            <button onclick="resetGame()">Réinitialiser le jeu</button>
+            <button onclick="window.location.href='/menu'">Retour au menu</button>
+        </div>
+    </div>
 </body>
 </html>

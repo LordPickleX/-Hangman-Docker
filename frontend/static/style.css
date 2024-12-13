@@ -1,0 +1,178 @@
+/* Reset global */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Mise en page globale */
+body {
+    background: linear-gradient(45deg, #FF6B6B, #FFB347, #4BBF6B);
+    background-size: 400% 400%;
+    animation: gradientAnimation 10s ease infinite;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    padding: 20px;
+}
+
+/* Animation pour le fond dégradé */
+@keyframes gradientAnimation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Conteneur principal */
+.container {
+    background: rgba(0, 0, 0, 0.6); /* Fond semi-transparent */
+    padding: 30px 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    max-width: 900px;
+    width: 100%;
+    text-align: center;
+}
+
+/* Titre principal */
+h1 {
+    font-size: 3em;
+    margin-bottom: 20px;
+    color: #FF6347;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Section du mot à deviner et informations du jeu */
+.game-info {
+    margin-bottom: 30px;
+}
+
+/* Affichage du mot à deviner */
+#mot {
+    font-size: 2.5em;
+    letter-spacing: 2px;
+    color: #fff;
+    word-wrap: break-word;
+    margin-bottom: 20px;
+}
+
+/* Image du pendu */
+.pendu-container {
+    margin: 20px 0;
+}
+
+#pendu-image {
+    width: 200px;
+    height: 200px;
+    transition: transform 0.3s ease;
+}
+
+#pendu-image:hover {
+    transform: scale(1.1);
+}
+
+/* Formulaire de devinette */
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 30px;
+}
+
+#lettre {
+    font-size: 1.5em;
+    padding: 10px;
+    margin-bottom: 20px;
+    width: 50%;
+    max-width: 150px;
+    text-align: center;
+    border: 2px solid #fff;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+#lettre:focus {
+    border-color: #FF6347;
+}
+
+/* Boutons */
+button {
+    background-color: #FF6347;
+    color: white;
+    font-size: 1.2em;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    margin: 10px 0;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 60%;
+    max-width: 200px;
+}
+
+button:hover {
+    background-color: #FF4500;
+}
+
+button:active {
+    background-color: #D95743;
+}
+
+/* Affichage des lettres perdues */
+#lettre-perdue {
+    font-size: 1.2em;
+    margin-top: 15px;
+    color: #00BFFF;
+    font-weight: bold;
+}
+
+/* Contenu des boutons de contrôle */
+.controls {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 450px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 2.5em;
+    }
+
+    #mot {
+        font-size: 2em;
+    }
+
+    #health {
+        font-size: 1.2em;
+    }
+
+    button {
+        font-size: 1em;
+        padding: 8px 15px;
+    }
+
+    #lettre {
+        width: 70%;
+    }
+
+    .controls {
+        flex-direction: column;
+        align-items: center;
+    }
+}
