@@ -6,10 +6,10 @@ services:
     container_name: mysql-words-dictionary
     platform: linux/amd64  # Forcer l'architecture pour garantir la compatibilité croisée
     environment:
-      MYSQL_ROOT_PASSWORD: watchoutfortherope
-      MYSQL_USER: admin
-      MYSQL_PASSWORD: death
-      MYSQL_DATABASE: words_dictionary
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
     networks:
       mynetwork:
     ports:
@@ -26,10 +26,10 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - MYSQL_HOST=mysql
-      - MYSQL_USER=admin
-      - MYSQL_PASSWORD=death
-      - MYSQL_DATABASE=words_dictionary
+      - MYSQL_HOST=${MYSQL_HOST}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
     depends_on:
       - mysql
     networks:
