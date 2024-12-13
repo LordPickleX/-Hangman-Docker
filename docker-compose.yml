@@ -15,6 +15,7 @@ services:
       - "3306:3306" # enlever le numéro de port pour empêcher l'accès à la database ?
     volumes:
       - mysql-data:/var/lib/mysql
+      - ./hangmandatabase.sql:/docker-entrypoint-initdb.d/hangmandatabase.sql
 
 networks:
   mynetwork:
