@@ -40,6 +40,10 @@
                 document.getElementById("mot").innerText = data.mot;
                 document.getElementById("health").innerText = data.health;
 
+                // Affiche les lettres perdues
+                const lettrePerdueElement = document.getElementById("lettre-perdue");
+                lettrePerdueElement.innerHTML = data.lettre_perdu.join(', '); // Affiche les lettres perdues
+
                 // appel de la fonction update de l'image
                 updatePenduImage(data.health);
 
@@ -110,6 +114,7 @@
         <button type="submit">Deviner</button>
     </form>
 
+     <p>Lettres testées et perdues : <span id="lettre-perdue"></span></p>
     <!-- bouton pour réinitialiser le jeu et retourner au menu -->
     <button onclick="resetGame()">Réinitialiser le jeu</button>
     <button onclick="window.location.href='/menu'">Retour au menu</button>

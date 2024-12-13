@@ -100,6 +100,7 @@ def home():
         session["mot"] = mot_aleatoire
         session["guessed_letters"] = ["_" for _ in session["mot"]]
         session["health"] = 7
+        session["lettre_perdues"] = []
 
     # on passe les données nécessaires mot et santé
     # ce sont les variables qui seront dans le fichier html
@@ -138,6 +139,8 @@ def deviner():
 
     guessed_letters = session["guessed_letters"]
     mot = session["mot"]
+    lettres_perdues = session.get("lettre_perdues", [])
+
 
     if lettre in mot:
         for i, char in enumerate(mot):
@@ -145,7 +148,9 @@ def deviner():
                 guessed_letters[i] = lettre
     else:
         session["health"] -= 1
+        lettres_perdues.append(lettre)
 
+    print(lettres_perdues)
 
     session["guessed_letters"] = guessed_letters
     session.modified = True
@@ -160,7 +165,8 @@ def deviner():
         "health": session["health"],  # vies restantes
         "mot_trouve": mot_trouve,  # indique si le mot est trouvé
         "perdu": perdu,  # indique si le jeu est perdu
-        "mot_complet": mot if perdu else None  # révèle le mot si perdu
+        "mot_complet": mot if perdu else None,  # révèle le mot si perdu
+        "lettre_perdu": lettres_perdues
     })
 
 # Route pour réinitialiser le jeu
