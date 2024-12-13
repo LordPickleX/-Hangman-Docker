@@ -146,6 +146,7 @@ def deviner():
     else:
         session["health"] -= 1
 
+
     session["guessed_letters"] = guessed_letters
     session.modified = True
 
