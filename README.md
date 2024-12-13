@@ -10,3 +10,6 @@ Hangman game web-app using Docker for deployment
 - ajouter un mot dans un catégorie
 - supprimer un mot dans un catégorie
 
+## Bibliothèque python a installer 
+
+pip install 

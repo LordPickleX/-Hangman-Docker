@@ -6,6 +6,14 @@ la bibliotheque qui permet ca c'est flask
 """
 
 from flask import Flask, render_template, request, session, jsonify, redirect
+from flask_sqlalchemy import SQLAlchemy
+import requests
+from sqlalchemy.dialects import mysql
+from sqlalchemy import create_engine
+import mysql.connector
+from flask import session
+
+
 
 # Initialisation de l'application Flask
 app = Flask(__name__)
@@ -22,12 +30,91 @@ def redirect_to_menu():
 def menu():
     return render_template("menu.html")
 
+
+
+
+
+
+
+
+
+
+
+
+# Configuration de la base de données
+db_config = {
+    'host': 'mysql',  # Nom du service ou de l'hôte
+    'user': 'admin',  # Nom d'utilisateur
+    'password': 'death',  # Mot de passe
+    'database': 'words_dictionary'  # Nom de la base de données
+}
+
+
+
+
+
+
+
+
+def get_random_word():
+    try:
+        # Initialisation de la connexion à la base de données
+        db = mysql.connector.connect(**db_config)
+
+        # Vérification de la connexion
+        if db.is_connected():
+            cursor = db.cursor()
+            cursor.execute("SELECT word FROM words_dictionary ORDER BY RAND() LIMIT 1")
+            result = cursor.fetchone()
+            cursor.close()
+            db.close()
+
+            if result:
+                return result[0]
+            else:
+                return "chocolat"  # Mot par défaut si aucun mot n'est trouvé
+        else:
+            return "chocolat"  # Mot par défaut si la connexion échoue
+
+    except mysql.connector.Error as err:
+        print(f"Database error: {err}")
+        return "chocolat"  # Mot par défaut en cas d'erreur
+
+
+
+
+
+
+
+
+
+
+
 # Route pour afficher la page de jeu
 @app.route("/game", methods=["GET"])
 def home():
     # initialisation des données dans la session si elles n'existent pas encore
     # cela permet de ne pas le refaire a chaque fois qu'on fait une action
     if "mot" not in session:
+        mot_aleatoire = get_random_word()
+        session["mot"] = mot_aleatoire
+        session["guessed_letters"] = ["_" for _ in session["mot"]]
+        session["health"] = 7
+
+    # on passe les données nécessaires mot et santé
+    # ce sont les variables qui seront dans le fichier html
+    return render_template("index.html", mot=" ".join(session["guessed_letters"]), health=session["health"])
+
+
+
+"""
+# Route pour afficher la page de jeu
+@app.route("/game", methods=["GET"])
+def home():
+    # initialisation des données dans la session si elles n'existent pas encore
+    # cela permet de ne pas le refaire a chaque fois qu'on fait une action
+    if "mot" not in session:
+        # mot_aleatoire = get_random_word()
         session["mot"] = "chocolat"
         session["guessed_letters"] = ["_" for _ in session["mot"]]
         session["health"] = 7
@@ -35,6 +122,11 @@ def home():
     # on passe les données nécessaires mot et santé
     # ce sont les variables qui seront dans le fichier html
     return render_template("index.html", mot=" ".join(session["guessed_letters"]), health=session["health"])
+
+"""
+
+
+
 
 # Route pour gérer la logique de devinette
 @app.route("/deviner", methods=["POST"])
@@ -77,4 +169,4 @@ def reset():
     return jsonify({"message": "Session réinitialisée avec succès."})
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True , host="0.0.0.0" , port=2323)

@@ -4,6 +4,7 @@ services:
   mysql:
     image: mysql:latest
     container_name: mysql-words-dictionary
+    platform: linux/amd64  # Forcer l'architecture pour garantir la compatibilité croisée
     environment:
       MYSQL_ROOT_PASSWORD: watchoutfortherope
       MYSQL_USER: admin
@@ -17,8 +18,40 @@ services:
       - mysql-data:/var/lib/mysql
       - ./hangmandatabase.sql:/docker-entrypoint-initdb.d/hangmandatabase.sql
 
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.backend  # Précise le nom du Dockerfile ici
+    container_name: backend
+    ports:
+      - "3000:3000"
+    environment:
+      - MYSQL_HOST=mysql
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=death
+      - MYSQL_DATABASE=words_dictionary
+    depends_on:
+      - mysql
+    networks:
+      - mynetwork
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.flask  # Nom du Dockerfile du frontend
+    container_name: frontend
+    ports:
+      - "2323:2323"
+    depends_on:
+      - backend
+    networks:
+      - mynetwork
+
+
 networks:
   mynetwork:
 
 volumes:
   mysql-data:
+
+

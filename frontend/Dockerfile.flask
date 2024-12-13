@@ -1,3 +1,23 @@
-FROM 
+# Utiliser une image officielle de Python comme base
+FROM python:3.9-slim
 
-EXPOSE
+# Créer et définir le répertoire de travail dans le conteneur
+WORKDIR /app
+
+# Mettre à jour pip
+RUN pip install --upgrade pip
+
+# Copier les fichiers de dépendances
+COPY requirements.txt .
+
+# Installer les dépendances
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copier tout le reste du code source dans le conteneur
+COPY . .
+
+# Exposer le port utilisé par Flask
+EXPOSE 5001
+
+# Définir la commande pour démarrer l'application Flask
+CMD ["python", "app.py"]
