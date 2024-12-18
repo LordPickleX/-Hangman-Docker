@@ -30,7 +30,10 @@ def redirect_to_menu():
 def menu():
     return render_template("menu.html")
 
-
+@app.route("/settings", methods=["GET"])
+# fonction qui affiche la page html menu
+def menu():
+    return render_template("settings.html")
 
 
 
@@ -82,7 +85,25 @@ def get_random_word():
 
 
 
+def add_word():
+    try:
+        # Initialisation de la connexion à la base de données
+        db = mysql.connector.connect(**db_config)
 
+        # Vérification de la connexion
+        if db.is_connected():
+            cursor = db.cursor()
+            cursor.execute("SELECT word FROM words_dictionary ORDER BY RAND() LIMIT 1")
+            cursor.execute("INSERT INTO words_dictionary()")
+            #result = cursor.fetchone()
+            cursor.close()
+            db.close()
+        else:
+            return "chocolat"  # Mot par défaut si la connexion échoue
+
+    except mysql.connector.Error as err:
+        print(f"Database error: {err}")
+        #return "chocolat"  # Mot par défaut en cas d'erreur
 
 
 

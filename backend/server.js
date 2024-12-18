@@ -37,6 +37,21 @@ app.get('/get-word', (req, res) => {
   });
 });
 
+
+app.post("/post-word", (req, res) => {
+  const { mot } = req.body;
+  const { category } = req.body;
+
+  let sql = "INSERT INTO games (mot, category) VALUES (?,?,?)"
+  db.query(sql, [mot, category], (err,result) =>{
+      if (err) {
+          console.log(err);
+      }else{
+          console.log(result);
+      }
+  })
+});
+
 // Démarrer le serveur
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
