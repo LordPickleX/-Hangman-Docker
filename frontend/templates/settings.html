@@ -1,36 +1,49 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menu Principal</title>
-    <!-- Lien vers le fichier CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='menu.css') }}">
+    <title>Ajouter un Mot</title>
 </head>
 <body>
-    <div class="menu-container">
-        <h1 class="menu-title">Bienvenue au jeu du Pendu</h1>
-        <!-- Boutons pour naviguer -->
-        <div class="menu-buttons">
-            <button class="menu-button" onclick="window.location.href='/game'">Commencer le jeu</button>
-            <button class="menu-button" onclick="openSettings()">Paramètres</button>
-            <button class="menu-button" onclick="quitGame()">Quitter le jeu</button>
-        </div>
-    </div>
+    <h1>Ajouter un Mot</h1>
 
-    <!-- JavaScript pour les interactions -->
+    <form id="addWordForm">
+        <input type="text" id="newWord" placeholder="Entrez un mot" required>
+        <button type="submit">Ajouter</button>
+    </form>
+
     <script>
-        // Placeholder pour les paramètres
-        function openSettings() {
-            alert("Les paramètres sont en cours de développement !");
-        }
+        document.getElementById("addWordForm").addEventListener("submit", async function(event) {
+            event.preventDefault(); // Empêche le rechargement de la page
 
-        // Placeholder pour quitter le jeu
-        function quitGame() {
-            if (confirm("Voulez-vous vraiment quitter ?")) {
-                window.close(); // Fonctionne uniquement pour les onglets ouverts par JS
+            const newWord = document.getElementById("newWord").value.trim();
+
+            if (!newWord) {
+                alert("Le mot ne peut pas être vide !");
+                return;
             }
-        }
+
+            try {
+                const response = await fetch("http://backend:2001/add_word", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ word: newWord })
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    alert("Mot ajouté avec succès !");
+                    document.getElementById("newWord").value = ''; // Efface le champ de texte
+                } else {
+                    alert(result.error || "Erreur inconnue lors de l'ajout du mot.");
+                }
+            } catch (error) {
+                alert("Impossible de se connecter au backend.");
+            }
+        });
     </script>
 </body>
 </html>

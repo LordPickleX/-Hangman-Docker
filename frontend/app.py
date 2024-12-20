@@ -1,159 +1,81 @@
-"""
-le fichier python app gere tout le deroulement du jeu et le processus des pages webs
-
-la bibliotheque qui permet ca c'est flask
-
-"""
-
 from flask import Flask, render_template, request, session, jsonify, redirect
-from flask_sqlalchemy import SQLAlchemy
-import requests
-from sqlalchemy.dialects import mysql
-from sqlalchemy import create_engine
-import mysql.connector
-from flask import session
+import requests  # Utilisation de requests pour envoyer des requêtes HTTP
 
-
+app = Flask(__name__)
 
 # Initialisation de l'application Flask
-app = Flask(__name__)
 app.secret_key = "secret_key_for_session"  # Clé secrète pour sécuriser les sessions
 
-# Redirection vers le menu principal par défaut
 @app.route("/", methods=["GET"])
-# fonction qui redirige l'utilisateur vers la page menu
 def redirect_to_menu():
     return redirect("/menu")
 
 @app.route("/menu", methods=["GET"])
-# fonction qui affiche la page html menu
 def menu():
     return render_template("menu.html")
 
 @app.route("/settings", methods=["GET"])
-# fonction qui affiche la page html menu
-def menu():
-    return render_template("settings.html")
-
-
-
-
-
-
-
-
-
-
-# Configuration de la base de données
-db_config = {
-    'host': 'mysql',  # Nom du service ou de l'hôte
-    'user': 'admin',  # Nom d'utilisateur
-    'password': 'death',  # Mot de passe
-    'database': 'words_dictionary'  # Nom de la base de données
-}
-
-
-
-
-
-
-
-
-def get_random_word():
+def settings():
     try:
-        # Initialisation de la connexion à la base de données
-        db = mysql.connector.connect(**db_config)
+        # Faire une requête au backend pour récupérer tous les mots
+        response = requests.get("http://backend:2001/get_words")
+        if response.status_code == 200:
+            words = response.json().get("words", [])
+        else:
+            words = []
+    except requests.exceptions.RequestException as e:
+        print(f"Erreur lors de la récupération des mots : {e}")
+        words = []
 
-        # Vérification de la connexion
-        if db.is_connected():
-            cursor = db.cursor()
-            cursor.execute("SELECT word FROM words_dictionary ORDER BY RAND() LIMIT 1")
-            result = cursor.fetchone()
-            cursor.close()
-            db.close()
+    return render_template("settings.html", words=words)
 
-            if result:
-                return result[0]
+
+
+
+
+@app.route("/game", methods=["GET"])
+def home():
+    # Vérifier si le mot est déjà dans la session
+    if "mot" not in session:
+        url = "http://backend:2001/get_random_word"  # Utiliser le nom du service "backend" pour accéder à l'API
+
+        try:
+            # Envoi de la requête GET pour récupérer le mot aléatoire
+            print(f"Requête GET vers l'URL : {url}")
+            response = requests.get(url)  # Utilisation de requests pour la requête GET
+
+            # Vérifier que la réponse est correcte
+            if response.status_code == 200:
+                print(f"Réponse de l'API : {response.text}")
+                data = response.json()  # Charger la réponse JSON
+                mot_aleatoire = data.get("word", "chocolat")  # Mot par défaut si la clé "word" est absente
+                print(f"Mot aléatoire récupéré : {mot_aleatoire}")
             else:
-                return "chocolat"  # Mot par défaut si aucun mot n'est trouvé
-        else:
-            return "chocolat"  # Mot par défaut si la connexion échoue
+                print(f"Erreur dans la réponse de l'API, code de statut {response.status_code}")
+                mot_aleatoire = "chocolat"  # Mot par défaut si la requête échoue
+        except requests.exceptions.RequestException as e:
+            print(f"Erreur lors de la requête : {e}")
+            mot_aleatoire = "chocolat"  # Mot par défaut en cas d'erreur
 
-    except mysql.connector.Error as err:
-        print(f"Database error: {err}")
-        return "chocolat"  # Mot par défaut en cas d'erreur
-
-
-
-def add_word():
-    try:
-        # Initialisation de la connexion à la base de données
-        db = mysql.connector.connect(**db_config)
-
-        # Vérification de la connexion
-        if db.is_connected():
-            cursor = db.cursor()
-            cursor.execute("SELECT word FROM words_dictionary ORDER BY RAND() LIMIT 1")
-            cursor.execute("INSERT INTO words_dictionary()")
-            #result = cursor.fetchone()
-            cursor.close()
-            db.close()
-        else:
-            return "chocolat"  # Mot par défaut si la connexion échoue
-
-    except mysql.connector.Error as err:
-        print(f"Database error: {err}")
-        #return "chocolat"  # Mot par défaut en cas d'erreur
-
-
-
-
-
-
-
-# Route pour afficher la page de jeu
-@app.route("/game", methods=["GET"])
-def home():
-    # initialisation des données dans la session si elles n'existent pas encore
-    # cela permet de ne pas le refaire a chaque fois qu'on fait une action
-    if "mot" not in session:
-        mot_aleatoire = get_random_word()
+        # Initialiser la session avec le mot aléatoire
         session["mot"] = mot_aleatoire
-        session["guessed_letters"] = ["_" for _ in session["mot"]]
-        session["health"] = 7
-        session["lettre_perdues"] = []
+        print(f"Mot stocké dans la session : {session['mot']}")
+        session["guessed_letters"] = ["_" for _ in mot_aleatoire]  # Liste de tirets pour chaque lettre du mot
+        session["health"] = 7  # Nombre de tentatives restantes
+        session["lettre_perdues"] = []  # Liste des lettres perdues
 
-    # on passe les données nécessaires mot et santé
-    # ce sont les variables qui seront dans le fichier html
+    # Rendu du template avec les informations du jeu
     return render_template("index.html", mot=" ".join(session["guessed_letters"]), health=session["health"])
 
 
 
-"""
-# Route pour afficher la page de jeu
-@app.route("/game", methods=["GET"])
-def home():
-    # initialisation des données dans la session si elles n'existent pas encore
-    # cela permet de ne pas le refaire a chaque fois qu'on fait une action
-    if "mot" not in session:
-        # mot_aleatoire = get_random_word()
-        session["mot"] = "chocolat"
-        session["guessed_letters"] = ["_" for _ in session["mot"]]
-        session["health"] = 7
-
-    # on passe les données nécessaires mot et santé
-    # ce sont les variables qui seront dans le fichier html
-    return render_template("index.html", mot=" ".join(session["guessed_letters"]), health=session["health"])
-
-"""
 
 
 
 
-# Route pour gérer la logique de devinette
+
 @app.route("/deviner", methods=["POST"])
 def deviner():
-    # Récupère la lettre envoyée depuis le client
     lettre = request.json.get("lettre", "").lower()
     if len(lettre) != 1 or not lettre.isalpha():
         return jsonify({"error": "Lettre invalide"}), 400
@@ -161,7 +83,6 @@ def deviner():
     guessed_letters = session["guessed_letters"]
     mot = session["mot"]
     lettres_perdues = session.get("lettre_perdues", [])
-
 
     if lettre in mot:
         for i, char in enumerate(mot):
@@ -171,30 +92,25 @@ def deviner():
         session["health"] -= 1
         lettres_perdues.append(lettre)
 
-    print(lettres_perdues)
-
     session["guessed_letters"] = guessed_letters
     session.modified = True
 
-    # vérifie si le jeu est gagné ou perdu
-    mot_trouve = "_" not in guessed_letters  # le mot est trouvé si plus de "_"
-    perdu = session["health"] <= 0  # le jeu est perdu si plus de vies
+    mot_trouve = "_" not in guessed_letters
+    perdu = session["health"] <= 0
 
-    # état actuel du jeu
     return jsonify({
-        "mot": " ".join(guessed_letters),  # mot partiellement deviné
-        "health": session["health"],  # vies restantes
-        "mot_trouve": mot_trouve,  # indique si le mot est trouvé
-        "perdu": perdu,  # indique si le jeu est perdu
-        "mot_complet": mot if perdu else None,  # révèle le mot si perdu
+        "mot": " ".join(guessed_letters),
+        "health": session["health"],
+        "mot_trouve": mot_trouve,
+        "perdu": perdu,
+        "mot_complet": mot if perdu else None,
         "lettre_perdu": lettres_perdues
     })
 
-# Route pour réinitialiser le jeu
 @app.route("/reset", methods=["POST"])
 def reset():
     session.clear()
     return jsonify({"message": "Session réinitialisée avec succès."})
 
 if __name__ == "__main__":
-    app.run(debug=True , host="0.0.0.0" , port=2323)
+    app.run(debug=True, host="0.0.0.0", port=2323)

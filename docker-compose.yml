@@ -4,16 +4,16 @@ services:
   mysql:
     image: mysql:latest
     container_name: mysql-words-dictionary
-    platform: linux/amd64  # Forcer l'architecture pour garantir la compatibilité croisée
+    platform: linux/amd64
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
     networks:
-      mynetwork:
+      - mynetwork
     ports:
-      - "3306:3306" # enlever le numéro de port pour empêcher l'accès à la database ?
+      - "3306:3306"
     volumes:
       - mysql-data:/var/lib/mysql
       - ./hangmandatabase.sql:/docker-entrypoint-initdb.d/hangmandatabase.sql
@@ -21,10 +21,10 @@ services:
   backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile.backend  # Précise le nom du Dockerfile ici
+      dockerfile: Dockerfile.backend
     container_name: backend
     ports:
-      - "3000:3000"
+      - "2001:2001"
     environment:
       - MYSQL_HOST=${MYSQL_HOST}
       - MYSQL_USER=${MYSQL_USER}
@@ -34,11 +34,13 @@ services:
       - mysql
     networks:
       - mynetwork
+    volumes:
+      - ./backend:/app/backend  # Partager le code backend avec le frontend
 
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile.flask  # Nom du Dockerfile du frontend
+      dockerfile: Dockerfile.flask
     container_name: frontend
     ports:
       - "2323:2323"
@@ -46,12 +48,11 @@ services:
       - backend
     networks:
       - mynetwork
-
+    volumes:
+      - ./backend:/app/backend  # Partager le code backend avec le frontend
 
 networks:
   mynetwork:
 
 volumes:
   mysql-data:
-
-

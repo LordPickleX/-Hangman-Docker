@@ -6,17 +6,17 @@
     font-family: 'Arial', sans-serif;
 }
 
-/* Mise en page globale */
+/* Body style */
 body {
-    background: linear-gradient(45deg, #FF6B6B, #FFB347, #4BBF6B);
+    background: linear-gradient(135deg, #6A0572, #093585, #3ecd97);
     background-size: 400% 400%;
-    animation: gradientAnimation 10s ease infinite;
-    height: 100vh;
+    animation: gradientAnimation 8s ease infinite;
     display: flex;
     justify-content: center;
     align-items: center;
+    height: 100vh;
+    margin: 0;
     color: white;
-    padding: 20px;
 }
 
 /* Animation pour le fond dégradé */
@@ -45,7 +45,7 @@ body {
 h1 {
     font-size: 3em;
     margin-bottom: 20px;
-    color: #FF6347;
+    color: #17d8c1;
     text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
 }
 
@@ -107,7 +107,7 @@ form {
 
 /* Boutons */
 button {
-    background-color: #FF6347;
+    background: #1d6dbd;
     color: white;
     font-size: 1.2em;
     border: none;
@@ -121,11 +121,11 @@ button {
 }
 
 button:hover {
-    background-color: #FF4500;
+    background-color: #101859;
 }
 
 button:active {
-    background-color: #D95743;
+    background-color: #0c0f45;
 }
 
 /* Affichage des lettres perdues */

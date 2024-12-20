@@ -13,11 +13,11 @@ COPY requirements.txt .
 # Installer les dépendances
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copier tout le reste du code source dans le conteneur
+# Copier tout le code source dans le conteneur
 COPY . .
 
 # Exposer le port utilisé par Flask
-EXPOSE 5001
+EXPOSE 2323
 
-# Définir la commande pour démarrer l'application Flask
+# Démarrer l'application Flask
 CMD ["python", "app.py"]
